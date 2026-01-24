@@ -7,16 +7,16 @@ An educational project that detects potential phishing websites using supervised
 
 > Disclaimer: This project is for educational purposes. Do not rely on it as a security product. Visiting unknown URLs can be risky; proceed with caution.
 
-## Access
+---
 
-Acces the app via: [https://ml-phising-detection.streamlit.app](https://ml-phising-detection.streamlit.app/)
-
-## Overview
+## 🫣 Overview
 - **Approach:** Supervised classification of phishing vs. legitimate websites using features extracted from HTML via BeautifulSoup.
 - **Models:** Linear SVM, Random Forest, Decision Tree, AdaBoost, Gaussian Naive Bayes, MLP (Neural Network), K-Nearest Neighbors.
 - **Sources:** Phishtank (verified phishing) and Tranco (top websites).
 
-## Project Structure
+---
+
+## 📂 Project Structure
 ```
 ML-phising-detection/
 ├─ app.py                      # Streamlit app for interactive predictions
@@ -33,7 +33,9 @@ ML-phising-detection/
 	 └─ verified_online.csv      # Phishtank verified (phishing candidates)
 ```
 
-## Setup (Windows + Conda)
+---
+
+## 🖥️ Setup (Windows + Conda)
 Prerequisites:
 - Miniconda/Anaconda installed
 - Internet access
@@ -49,6 +51,8 @@ Verify versions (optional):
 python --version
 python -c "import sklearn, bs4, pandas, streamlit; print('OK')"
 ```
+
+---
 
 ## Data Collection
 The training scripts expect two structured CSVs built from raw URL lists.
@@ -80,7 +84,9 @@ Notes:
 - The script uses `requests.get(..., verify=False, timeout=4)` to be resilient; TLS verification is disabled for collection convenience.
 - Errors and timeouts are handled per-URL to avoid stopping the run.
 
-## Training & Evaluation
+---
+
+## 🦾 Training & Evaluation
 Train models and compute manual K-Fold metrics:
 ```powershell
 python machine_learning.py
@@ -98,7 +104,9 @@ No se encontraron los archivos CSV estructurados. Ejecuta data_collector.py prim
 ```
 Generate the data as described above before training or running the app.
 
-## Streamlit App (Interactive)
+---
+
+## 👑 Streamlit App (Interactive)
 Launch the UI:
 ```powershell
 streamlit run app.py
@@ -113,23 +121,24 @@ Behaviors:
 - Shows success/warning feedback based on prediction
 - If dataframes/models aren’t loaded (missing CSVs), the app will warn and may not allow predictions
 
-## Feature Set
+---
+
+## ⛲ Feature Set
 From `features.py` (binary and quantitative):
 - Binary: `has_title`, `has_input`, `has_button`, `has_image`, `has_submit`, `has_link`, `has_password`, `has_email_input`, `has_hidden_element`, `has_audio`, `has_video`
 - Counts: `number_of_inputs`, `number_of_buttons`, `number_of_images` (including meta image), `number_of_option`, `number_of_list`, `number_of_th`, `number_of_tr`, `number_of_href`, `number_of_paragraph`, `number_of_script`, `length_of_title`
 
 Vectors are built in `feature_extraction.py` and consumed by both the training script and the app.
 
-## Troubleshooting
+---
+
+## 🐞 Troubleshooting
 - Missing structured CSVs: Build datasets via `data_collector_legit.py` first.
 - Request errors/timeouts: The collector/app log per-URL issues; continue with available pages.
 - Streamlit shows "Dataframes not loaded correctly": Train first (`machine_learning.py`) so `ml.df_results` exists.
 - SSL warnings: Disabled in collection for convenience; re-enable for production use.
 
-## Extending
-- Add new HTML features in `features.py` and update `feature_extraction.py` accordingly.
-- Tune model hyperparameters in `machine_learning.py` (e.g., `RandomForestClassifier(n_estimators=...)`, `MLPClassifier(...)`).
-- Increase dataset size by adjusting the slice in the collector and/or sourcing more URLs.
+---
 
 ## References
 - Phishtank (verified phishing feed): https://phishtank.org/
