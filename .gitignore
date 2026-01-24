@@ -1,0 +1,40 @@
+# ==========================
+# PYTHON (Entornos y Compilados)
+# ==========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.DS_Store
+
+# Si no queremos subir logs pesados
+/data/*.log
+
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ==========================
+# IDEs y Editores (Configuraciones de usuario)
+# ==========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ==========================
+# OTROS
+# ==========================
+# Ignorar vídeos o imágenes de prueba
+*.mp4
+*.avi
+*.png
+*.jpg
+*.wav
+*.mp3
+*.flac
