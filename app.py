@@ -8,6 +8,13 @@ import matplotlib.pyplot as plt
 st.title('Phishing Website Detection using Machine Learning')
 st.write('This ML-based app is developed for educational purposes.')
 
+# Determine availability of training artifacts
+model_attrs = [
+    'nb_model', 'svm_model', 'dt_model', 'rf_model', 'ab_model', 'nn_model', 'kn_model'
+]
+models_ready = all(hasattr(ml, attr) for attr in model_attrs)
+df_results_available = hasattr(ml, 'df_results')
+
 with st.expander("PROJECT DETAILS"):
     st.subheader('Approach')
     st.write('I used supervised learning to classify phishing and legitimate websites using content-based features.')
@@ -30,7 +37,10 @@ with st.expander("PROJECT DETAILS"):
         st.write("Dataframes not loaded correctly for visualization.")
 
     st.subheader('Results')
-    st.table(ml.df_results)
+    if df_results_available:
+        st.table(ml.df_results)
+    else:
+        st.info("Results table unavailable: training artifacts not found. Run machine_learning.py to generate metrics and models.")
 
 # Selección del modelo
 choice = st.selectbox("Please select your machine learning model",
@@ -39,20 +49,23 @@ choice = st.selectbox("Please select your machine learning model",
 )
 
 model = None
-if choice == 'Gaussian Naive Bayes': model = ml.nb_model
-elif choice == 'Support Vector Machine': model = ml.svm_model
-elif choice == 'Decision Tree': model = ml.dt_model
-elif choice == 'Random Forest': model = ml.rf_model
-elif choice == 'AdaBoost': model = ml.ab_model
-elif choice == 'Neural Network': model = ml.nn_model
-elif choice == 'K-Neighbours': model = ml.kn_model
+if models_ready:
+    if choice == 'Gaussian Naive Bayes': model = ml.nb_model
+    elif choice == 'Support Vector Machine': model = ml.svm_model
+    elif choice == 'Decision Tree': model = ml.dt_model
+    elif choice == 'Random Forest': model = ml.rf_model
+    elif choice == 'AdaBoost': model = ml.ab_model
+    elif choice == 'Neural Network': model = ml.nn_model
+    elif choice == 'K-Neighbours': model = ml.kn_model
 
 st.write(f'{choice} model is selected!')
+if not models_ready:
+    st.warning("Models are not available. Please run machine_learning.py to train and expose models.")
 
 # Input y Predicción
 url = st.text_input('Enter the URL to check')
 
-if st.button('Check!'):
+if st.button('Check!', disabled=not models_ready):
     try:
         response = re.get(url, verify=False, timeout=4)
         if response.status_code != 200:

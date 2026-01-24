@@ -7,6 +7,10 @@ An educational project that detects potential phishing websites using supervised
 
 > Disclaimer: This project is for educational purposes. Do not rely on it as a security product. Visiting unknown URLs can be risky; proceed with caution.
 
+## Access
+
+Acces the app via: [https://ml-phising-detection.streamlit.app](https://ml-phising-detection.streamlit.app/)
+
 ## Overview
 - **Approach:** Supervised classification of phishing vs. legitimate websites using features extracted from HTML via BeautifulSoup.
 - **Models:** Linear SVM, Random Forest, Decision Tree, AdaBoost, Gaussian Naive Bayes, MLP (Neural Network), K-Nearest Neighbors.
@@ -130,6 +134,3 @@ Vectors are built in `feature_extraction.py` and consumed by both the training s
 ## References
 - Phishtank (verified phishing feed): https://phishtank.org/
 - Tranco list (top websites): https://tranco-list.eu/
-
-## License
-No license is specified. If you plan to distribute or use this project beyond personal/educational purposes, add an appropriate license.
