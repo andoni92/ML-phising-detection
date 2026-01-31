@@ -44,6 +44,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 # Get the absolute path of the current script's directory
 # This ensures correct file paths regardless of where the script is run from
@@ -203,6 +204,37 @@ try:
     if __name__ == "__main__":
         df_results.plot.bar(rot=0)
         plt.show()
+
+    # ========== 7. SAVE ARTIFACTS ==========
+    print("Saving files...")
+
+    # 1. Save the metrics table (df_results) to a CSV
+    df_results.to_csv(os.path.join(current_dir, 'metrics.csv'))
+    print("- MMetrics saved to 'metrics.csv'")
+    # 2. Save the trained models
+    
+    # Create a directory to organize the models (optional but recommended)
+    models_dir = os.path.join(current_dir, 'models')
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+
+    # Dictionary with the models you already trained in section 2
+    models_to_save = {
+        'RF': rf_model,
+        'DT': dt_model,
+        'SVM': svm_model,
+        'AB': ab_model,
+        'NB': nb_model,
+        'NN': nn_model,
+        'KN': kn_model
+    }
+
+    # Save each model to a .pkl file
+    for name, model in models_to_save.items():
+        file_path = os.path.join(models_dir, f'{name}_model.pkl')
+        with open(file_path, 'wb') as file:
+            pickle.dump(model, file)
+        print(f"- Model {name} saved to {file_path}")
 
 except FileNotFoundError:
     print("Structured CSV files not found. Please run data_collector_legit.py first.")
