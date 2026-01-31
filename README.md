@@ -7,6 +7,8 @@ An educational project that detects potential phishing websites using supervised
 
 > Disclaimer: This project is for educational purposes. Do not rely on it as a security product. Visiting unknown URLs can be risky; proceed with caution.
 
+Accesible at: [ml-phising-detection.streamlit.app](https://ml-phising-detection.streamlit.app/)
+
 ---
 
 ## 🫣 Overview
@@ -25,7 +27,11 @@ ML-phising-detection/
 ├─ features.py                 # Individual feature functions
 ├─ data_collector_legit.py     # Dataset builder (legit or phishing)
 ├─ environment.yml             # Conda environment with dependencies
+├─ metrics.csv                 # Metrics of the trained models
 ├─ README.md                   # This file
+├─ models/					   # Trained models
+│    ├─ AB_model.pkl
+│	 └─ ...             
 └─ datasets/
 	 ├─ structured_data_legitimate.csv
 	 ├─ structured_data_phishing.csv
