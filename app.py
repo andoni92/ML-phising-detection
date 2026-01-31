@@ -16,35 +16,60 @@ Date: 2026
 """
 
 import streamlit as st
-import machine_learning as ml
 import feature_extraction as fe
 from bs4 import BeautifulSoup
 import requests as re
 import matplotlib.pyplot as plt
+import pandas as pd
+import pickle
+import os
 
 # Set up the main title and description
 st.title('Phishing Website Detection using Machine Learning')
 st.write('This ML-based app is developed for educational purposes.')
 
-# Check if all required machine learning models have been trained and are available
-# These models should be created by running machine_learning.py before starting the app
-model_attrs = [
-    'nb_model',   # Gaussian Naive Bayes
-    'svm_model',  # Support Vector Machine
-    'dt_model',   # Decision Tree
-    'rf_model',   # Random Forest
-    'ab_model',   # AdaBoost
-    'nn_model',   # Neural Network
-    'kn_model'    # K-Nearest Neighbors
-]
+# --- LOADING MODELS AND DATA ---
 
-# Verify that all models are accessible from the machine_learning module
-models_ready = all(hasattr(ml, attr) for attr in model_attrs)
+# Function to load models with caching (to avoid reloading frequently)
+@st.cache_resource
+def load_models():
+    models = {}
+    model_files = {
+        'Gaussian Naive Bayes': 'NB_model.pkl',
+        'Support Vector Machine': 'SVM_model.pkl',
+        'Decision Tree': 'DT_model.pkl',
+        'Random Forest': 'RF_model.pkl',
+        'AdaBoost': 'AB_model.pkl',
+        'Neural Network': 'NN_model.pkl',
+        'K-Neighbours': 'KN_model.pkl'
+    }
+    
+    # Directory where we saved the models in the previous step
+    models_dir = os.path.join(os.path.dirname(__file__), 'models')
+    
+    for name, filename in model_files.items():
+        try:
+            path = os.path.join(models_dir, filename)
+            with open(path, 'rb') as file:
+                models[name] = pickle.load(file)
+        except FileNotFoundError:
+            st.error(f"Error: The file {filename} was not found. Please run machine_learning.py first.")
+            return None
+    return models
 
-# Check if performance results DataFrame is available for display
-df_results_available = hasattr(ml, 'df_results')
+# Load the models
+loaded_models = load_models()
+models_ready = loaded_models is not None
 
-# Create an expandable section containing project information and results
+# Try to load the metrics (df_results) from the CSV
+try:
+    df_results = pd.read_csv('metrics.csv', index_col=0)
+    df_results_available = True
+except FileNotFoundError:
+    df_results_available = False
+
+# --- GRAPHICAL INTERFACE ---
+
 with st.expander("PROJECT DETAILS"):
     st.subheader('Approach')
     st.write('I used supervised learning to classify phishing and legitimate websites using content-based features.')
@@ -52,86 +77,74 @@ with st.expander("PROJECT DETAILS"):
     st.subheader('Data set')
     st.write('Sources: "phishtank.org" & "tranco-list.eu"')
     
-    # Display a pie chart showing the distribution of phishing vs legitimate websites in the dataset
+    # Pie Chart
+    # Load only what is necessary for the chart
     try:
-        labels = 'Phishing', 'Legitimate'
-        phishing_len = ml.phishing_df.shape[0]
-        legit_len = ml.legitimate_df.shape[0]
-        sizes = [phishing_len, legit_len]
-        explode = (0.1, 0)
-        fig, ax = plt.subplots()
-        ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
-        ax.axis('equal')
-        st.pyplot(fig)
-    except:
-        st.write("Dataframes not loaded correctly for visualization.")
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        path_legit = os.path.join(current_dir, 'datasets', 'structured_data_legitimate.csv')
+        path_phish = os.path.join(current_dir, 'datasets', 'structured_data_phishing.csv')
+        
+        # Read only if files exist to count rows
+        if os.path.exists(path_legit) and os.path.exists(path_phish):
+            # Use chunksize or nrows if very large, but here we read directly
+            legit_len = len(pd.read_csv(path_legit, usecols=[0]))
+            phishing_len = len(pd.read_csv(path_phish, usecols=[0]))
+            
+            labels = 'Phishing', 'Legitimate'
+            sizes = [phishing_len, legit_len]
+            explode = (0.1, 0)
+            fig, ax = plt.subplots()
+            ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
+            ax.axis('equal')
+            st.pyplot(fig)
+        else:
+            st.write("Dataset files not found for visualization.")
+    except Exception as e:
+        st.write(f"Could not load dataset visualization: {e}")
 
     st.subheader('Results')
     if df_results_available:
-        st.table(ml.df_results)
+        st.table(df_results)
     else:
-        st.info("Results table unavailable: training artifacts not found. Run machine_learning.py to generate metrics and models.")
+        st.info("Results table unavailable: metrics.csv not found.")
 
-# Allow the user to select which machine learning model to use for prediction
+# Model selector
 choice = st.selectbox("Please select your machine learning model",
     ['Gaussian Naive Bayes', 'Support Vector Machine', 'Decision Tree', 'Random Forest',
      'AdaBoost', 'Neural Network', 'K-Neighbours']
 )
 
-# Map the user's selection to the corresponding trained model object
+# Select the loaded model from the dictionary
 model = None
 if models_ready:
-    if choice == 'Gaussian Naive Bayes': 
-        model = ml.nb_model
-    elif choice == 'Support Vector Machine': 
-        model = ml.svm_model
-    elif choice == 'Decision Tree': 
-        model = ml.dt_model
-    elif choice == 'Random Forest': 
-        model = ml.rf_model
-    elif choice == 'AdaBoost': 
-        model = ml.ab_model
-    elif choice == 'Neural Network': 
-        model = ml.nn_model
-    elif choice == 'K-Neighbours': 
-        model = ml.kn_model
+    model = loaded_models.get(choice)
 
 st.write(f'{choice} model is selected!')
 if not models_ready:
-    st.warning("Models are not available. Please run machine_learning.py to train and expose models.")
+    st.warning("Models are not available. Please ensure .pkl files are in the 'models/' directory.")
 
-# Create text input for URL and prediction button
+# URL input and prediction
 url = st.text_input('Enter the URL to check')
 
-# When the user clicks the "Check!" button (disabled if models aren't ready)
 if st.button('Check!', disabled=not models_ready):
     try:
-        # Fetch the website content with SSL verification disabled and a 4-second timeout
         response = re.get(url, verify=False, timeout=4)
         
-        # Check if the HTTP request was successful
         if response.status_code != 200:
             st.warning("HTTP connection was not successful.")
         else:
-            # Parse the HTML content using BeautifulSoup
             soup = BeautifulSoup(response.content, "html.parser")
-            
-            # Extract feature vector from the parsed HTML (must be a 2D array for prediction)
             vector = [fe.create_vector(soup)]
             
-            # Use the selected model to predict if the website is phishing or legitimate
+            # Prediction
             result = model.predict(vector)
             
-            # Display the prediction result with visual feedback
             if result[0] == 0:
-                # Label 0 indicates a legitimate website
                 st.success("This web page seems Legitimate!")
                 st.balloons()
             else:
-                # Label 1 indicates a potential phishing website
                 st.warning("Attention! This web page is potential PHISHING!")
                 st.snow()
                 
     except re.exceptions.RequestException as e:
-        # Handle any errors that occur during the HTTP request
         st.error(f"Error: {e}")
