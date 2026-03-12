@@ -1,20 +1,35 @@
-# Machine Learning for Phishing Website Detection
+<div align="center">
+	
+<h1> Machine Learning for Phishing Website Detection </h1><p>
 
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20Demo-FF4B4B?logo=streamlit&logoColor=white)](https://ml-phising-detection.streamlit.app/)
+[![Python 3.12.4](https://img.shields.io/badge/Python-3.12.4-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+![Conda](https://img.shields.io/badge/Conda-Environment-44A833?logo=anaconda&logoColor=white)
+
+![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikit-learn&logoColor=white)
+![pandas](https://img.shields.io/badge/pandas-Data%20Processing-150458?logo=pandas&logoColor=white)
+![Phishtank](https://img.shields.io/badge/Data-Phishtank-red)
+![Tranco](https://img.shields.io/badge/Data-Tranco-blue)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+
+</div>
+
+## 📖 Description
 An educational project that detects potential phishing websites using supervised machine learning and content-based HTML features. It includes:
 - A data collection script to build structured datasets from raw URL lists
 - Multiple ML models trained on extracted HTML features
 - A Streamlit app to test URLs interactively
 
-> Disclaimer: This project is for educational purposes. Do not rely on it as a security product. Visiting unknown URLs can be risky; proceed with caution.
-
-Accesible at: [ml-phising-detection.streamlit.app](https://ml-phising-detection.streamlit.app/)
-
----
-
-## 🫣 Overview
+Overview:
 - **Approach:** Supervised classification of phishing vs. legitimate websites using features extracted from HTML via BeautifulSoup.
 - **Models:** Linear SVM, Random Forest, Decision Tree, AdaBoost, Gaussian Naive Bayes, MLP (Neural Network), K-Nearest Neighbors.
 - **Sources:** Phishtank (verified phishing) and Tranco (top websites).
+
+**Accesible at: [ml-phising-detection.streamlit.app](https://ml-phising-detection.streamlit.app/)**
+
+> Disclaimer: This project is for educational purposes. Do not rely on it as a security product. Visiting unknown URLs can be risky; proceed with caution.
 
 ---
 
@@ -60,7 +75,7 @@ python -c "import sklearn, bs4, pandas, streamlit; print('OK')"
 
 ---
 
-## Data Collection
+## 📊 Data Collection
 The training scripts expect two structured CSVs built from raw URL lists.
 
 1) Place raw datasets under `datasets/`:
@@ -106,7 +121,7 @@ This script:
 
 If the structured CSV files are missing, it will print:
 ```
-No se encontraron los archivos CSV estructurados. Ejecuta data_collector.py primero.
+Structured CSV files not found. Please run data_collector_legit.py first.
 ```
 Generate the data as described above before training or running the app.
 
@@ -138,7 +153,7 @@ Vectors are built in `feature_extraction.py` and consumed by both the training s
 
 ---
 
-## 🐞 Troubleshooting
+## ⚠️ Troubleshooting
 - Missing structured CSVs: Build datasets via `data_collector_legit.py` first.
 - Request errors/timeouts: The collector/app log per-URL issues; continue with available pages.
 - Streamlit shows "Dataframes not loaded correctly": Train first (`machine_learning.py`) so `ml.df_results` exists.
